@@ -104,7 +104,10 @@ const hostSession = async ({
         }
     }
 
-    const hostOffer = await peer.createOffer({offerToReceiveVideo: true});
+    const hostOffer = await peer.createOffer({
+        offerToReceiveVideo: true,
+        offerToReceiveAudio: true,
+    });
     await peer.setLocalDescription(hostOffer);
     send({type: 'hostoffer', payload: {value: hostOffer, sid: sid}});
 
@@ -143,10 +146,12 @@ const clientSession = async ({
             done();
         }
     };
+
+    const stream = new MediaStream();
+
     peer.ontrack = (event) => {
-        const stream = new MediaStream();
         stream.addTrack(event.track);
-        onTrack(stream);
+        if (event.track.kind == 'video') onTrack(stream);
     };
 
     return peer;
@@ -327,6 +332,7 @@ export const useRoom = (config: UIConfig): UseRoom => {
         }
         stream.current = await navigator.mediaDevices.getDisplayMedia({
             video: {frameRate: loadSettings().framerate},
+            audio: true,
         });
         stream.current?.getVideoTracks()[0].addEventListener('ended', () => stopShare());
         setState((current) => (current ? {...current, hostStream: stream.current} : current));

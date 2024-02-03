@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import {Badge, IconButton, Paper, Theme, Tooltip, Typography} from '@mui/material';
+import {Badge, IconButton, Paper,Slider, Stack, Theme, Tooltip, Typography} from '@mui/material';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import FullScreenIcon from '@mui/icons-material/Fullscreen';
@@ -13,6 +13,8 @@ import {useSnackbar} from 'notistack';
 import {RoomUser} from './message';
 import {useSettings, VideoDisplayMode} from './settings';
 import {SettingDialog} from './SettingDialog';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeDownIcon from '@mui/icons-material/VolumeDown';
 
 const HostStream: unique symbol = Symbol('mystream');
 
@@ -64,6 +66,7 @@ export const Room = ({
 }) => {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
+    const [volume, setVolume] = React.useState(0); // use 0-100 for volume since Slider handled float weirdly
     const {enqueueSnackbar} = useSnackbar();
     const [settings, setSettings] = useSettings();
     const [showControl, setShowControl] = React.useState(true);
@@ -97,6 +100,7 @@ export const Room = ({
     React.useEffect(() => {
         if (videoElement && stream) {
             videoElement.srcObject = stream;
+            videoElement.volume = volume;
             videoElement.play().catch((e) => console.log('Could not play main video', e));
         }
     }, [videoElement, stream]);
@@ -194,7 +198,6 @@ export const Room = ({
 
             {stream ? (
                 <video
-                    muted
                     ref={setVideoElement}
                     className={videoClasses()}
                     onDoubleClick={handleFullscreen}
@@ -264,6 +267,15 @@ export const Room = ({
                             <SettingsIcon fontSize="large" />
                         </IconButton>
                     </Tooltip>
+                    <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                            <VolumeDownIcon/>
+                            <Slider max={100} step={1} aria-label="Volume" defaultValue={0} value={volume} onChange={(_e,v) =>{
+                                    setVolume(v as number)
+                                    if(videoElement)videoElement.volume = (v as number) / 100.0
+                            }} />
+                            <VolumeUpIcon/>
+                        
+                    </Stack>
                 </Paper>
             )}
 
