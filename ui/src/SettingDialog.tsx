@@ -45,7 +45,7 @@ export const SettingDialog = ({open, setOpen, updateName, saveSettings}: Setting
         setOpen(false);
     };
 
-    const {name, preferCodec, displayMode, framerate} = settingsInput;
+    const {name, preferCodec, displayMode, framerate, bitrate} = settingsInput;
 
     return (
         <Dialog open={open} onClose={() => setOpen(false)} maxWidth={'xs'} fullWidth>
@@ -108,6 +108,15 @@ export const SettingDialog = ({open, setOpen, updateName, saveSettings}: Setting
                             min={1}
                             onChange={(framerate) => setSettingsInput((c) => ({...c, framerate}))}
                             value={framerate}
+                            fullWidth
+                        />
+                    </Box>
+                    <Box paddingTop={1}>
+                        <NumberField
+                            label="Bitrate in Kbps"
+                            min={1}
+                            onChange={(bitrate) => setSettingsInput((c) => ({...c, bitrate}))}
+                            value={bitrate}
                             fullWidth
                         />
                     </Box>

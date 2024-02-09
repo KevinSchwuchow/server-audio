@@ -104,6 +104,17 @@ const hostSession = async ({
         }
     }
 
+    for (const sender of peer.getSenders()) {
+        if (sender.track?.kind == 'video') {
+            const parameters = sender.getParameters();
+            const kb = 1000;
+            parameters.encodings[0].maxBitrate = loadSettings().bitrate*kb;
+            parameters.encodings[0].maxFramerate = loadSettings().framerate;
+            sender.setParameters(parameters);
+            console.log('parameters', parameters);
+        }
+    }
+
     const hostOffer = await peer.createOffer({
         offerToReceiveVideo: true,
         offerToReceiveAudio: true,
